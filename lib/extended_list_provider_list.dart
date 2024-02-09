@@ -22,19 +22,21 @@ class ListViewLayoutList<T> extends ListViewLayoutDefault<T> {
           return builder!(context, listContext, item, isSelected);
         }
 
-        return ListTile(
-          selected: isSelected,
-          onTap:
-              listContext.onTap == null ? null : () => listContext.onTap!(item),
-          onDoubleTap: listContext.onDoubleTap == null
-              ? null
-              : () => listContext.onDoubleTap!(item),
-          onLongPress: listContext.onLongTap == null
-              ? null
-              : () => listContext.onLongTap!(item),
-          title: Text(item.toString()),
-          //)
-        );
+        return GestureDetector(
+            onTap: listContext.onTap == null
+                ? null
+                : () => listContext.onTap!(item),
+            onDoubleTap: listContext.onDoubleTap == null
+                ? null
+                : () => listContext.onDoubleTap!(item),
+            onLongPress: listContext.onLongTap == null
+                ? null
+                : () => listContext.onLongTap!(item),
+            child: ListTile(
+              selected: isSelected,
+              title: Text(item.toString()),
+              //)
+            ));
       },
       itemCount: items.length,
     );

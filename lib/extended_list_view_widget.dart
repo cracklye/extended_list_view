@@ -271,17 +271,60 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
     List<Widget> btns = [];
     if (widget.onOrderByChange != null && widget.orderBy != null) {
       if (widget.orderBy!.length > 1) {
-        btns.add(DropDownButton<ListViewOrderByItem>(
-          title: const Icon(Icons.arrow_downward),
-          onPressed: (p0) => widget.onOrderByChange!(p0),
-          items: widget.orderBy!
-              .map((e) => DropDownItem<ListViewOrderByItem>(
-                    //TODO selected:
-                    content: e.label,
-                    value: e,
+        //TODO need to set the
+        btns.add(MenuAnchor(
+          // childFocusNode: _buttonFocusNode,
+          menuChildren: widget.orderBy!
+              .map((e) => MenuItemButton(
+                    child: e.label,
+                    onPressed: () => widget.onOrderByChange!(e),
                   ))
               .toList(),
+          // [
+          //   MenuItemButton(
+          //     child: Text("Remove Cover image"),
+          //     onPressed: () => print("Remove cover image"),
+          //   ),
+          //   MenuItemButton(
+          //     child: Text("Add Cover image"),
+          //     onPressed: () => print("Add cover image"),
+          //   ),
+          //   MenuItemButton(
+          //     child: Text("Delete"),
+          //     onPressed: () => print("Delete"),
+          //   ),
+          //   MenuItemButton(
+          //     child: Text("Export Note"),
+          //     onPressed: () async => await _doNoteExport(model),
+          //   ),
+          // ],
+          builder:
+              (BuildContext context, MenuController controller, Widget? child) {
+            return IconButton(
+              // focusNode: _buttonFocusNode,
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              icon: Icon(Icons.arrow_downward),
+            );
+          },
         ));
+
+        // btns.add(DropDownButton<ListViewOrderByItem>(
+        //   title: const Icon(Icons.arrow_downward),
+        //   onPressed: (p0) => widget.onOrderByChange!(p0),
+        //   items: widget.orderBy!
+        //       .map((e) => DropDownItem<ListViewOrderByItem>(
+        //             //TODO selected:
+        //             content: e.label,
+        //             value: e,
+        //           ))
+        //       .toList(),
+        // ));
 
         // for (var ob in widget.orderBy!) {
         //   btns.add(ElevatedButton(
@@ -315,8 +358,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
       return Row(
         children: [
           Expanded(
-              child: m.Material(
-                  child: m.TextFormField(
+              child: TextFormField(
             controller: _searchController,
             onChanged: (value) {
               if (widget.onSearchChange != null) {
@@ -337,7 +379,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
                             : () =>
                                 widget.onSearchClear!(_searchController.text),
                       )),
-          )))
+          ))
         ],
       );
     }
