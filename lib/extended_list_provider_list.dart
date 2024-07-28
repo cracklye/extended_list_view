@@ -14,6 +14,7 @@ class ListViewLayoutList<T> extends ListViewLayoutDefault<T> {
   Widget buildContent(
       BuildContext context, List<T> items, ExtendedListContext<T> listContext) {
     return ListView.builder(
+      controller: listContext.autoScrollController,
       itemBuilder: (context, index) {
         var item = items[index];
         var isSelected = listContext.isSelected(item);
@@ -21,15 +22,20 @@ class ListViewLayoutList<T> extends ListViewLayoutDefault<T> {
         if (builder != null) {
           return builder!(context, listContext, item, isSelected);
         }
-        return buildContentItemGestureDetector(context, item, listContext,
-            buildContentItem(context, item, listContext));
+        return buildAutoScroll(
+            context,
+            item,
+            listContext,
+            buildContentItemGestureDetector(context, item, listContext,
+                buildContentItem(context, item, listContext, index), index),
+            index);
       },
       itemCount: items.length,
     );
   }
 
-  Widget buildContentItem(
-      BuildContext context, T item, ExtendedListContext<T> listContext) {
+  Widget buildContentItem(BuildContext context, T item,
+      ExtendedListContext<T> listContext, int index) {
     var isSelected = listContext.isSelected(item);
 
     return ListTile(

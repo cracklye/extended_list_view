@@ -3,6 +3,7 @@ import 'package:extended_list_view/extended_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'test_item.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,6 +57,13 @@ ContextMenuBuilder<TestItem> contextMenuBuilder =
         },
         label: 'Print',
       ),
+      ContextMenuButtonItem(
+        onPressed: () {
+          ContextMenuController.removeAny();
+          // _showDialog(context);
+        },
+        label: 'Print ${item.toString()}',
+      ),
     ],
   );
 };
@@ -86,6 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _enableContextMenu = false;
   bool _enableBuildToolbarFooter = false;
   bool _enableBuildToolbarSub = false;
+
+  static AutoScrollController _autoscrollController = AutoScrollController();
 
   List<TestItem> _selected = [];
   bool _enableSelected = false;
@@ -158,14 +168,23 @@ class _MyHomePageState extends State<MyHomePage> {
   List<TestItem> options = [];
 
   @override
-  void setState(VoidCallback fn) {
-    super.setState(fn);
+  void initState() {
+    super.initState();
     List<TestItem> opt = [];
     for (int i = 0; i < 200; i++) {
-      opt.add(TestItem(label: "Test Item $i"));
+      opt.add(TestItem(label: "Test Item $i", index: i));
     }
     options = opt;
   }
+  // @override
+  // void setState(VoidCallback fn) {
+  //   super.setState(fn);
+  //   List<TestItem> opt = [];
+  //   for (int i = 0; i < 200; i++) {
+  //     opt.add(TestItem(label: "Test Item $i"));
+  //   }
+  //   options = opt;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -225,11 +244,24 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           if (_enableSelected)
             Wrap(
-              children: _selected.map((i) => Text(i.toString())).toList(),
+              children: _selected
+                  .map((i) => enableMoveToItem
+                      ? TextButton(
+                          onPressed: () async {
+                            print("Clicked $i");
+                            await _autoscrollController.scrollToIndex(i.index,
+                                preferPosition: AutoScrollPosition.begin);
+                            _autoscrollController.highlight(i.index);
+                          },
+                          child: Text(i.toString()))
+                      : Text(i.toString()))
+                  .toList(),
             ),
           Divider(),
           Expanded(
               child: ExtendedListView<TestItem>(
+            autoScrollController:
+                enableMoveToItem ? _autoscrollController : null,
             isLoading: _isLoading,
             defaultSearchText: "Default Search Text",
             enableSearch: _enableSearch,

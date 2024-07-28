@@ -1,7 +1,8 @@
 class TestItem {
-  TestItem({required this.label, this.description = ""});
+  TestItem({required this.label, required this.index, this.description = ""});
 
   final String label;
+  final int index;
 
   final String description;
 

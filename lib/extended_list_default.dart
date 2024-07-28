@@ -1,7 +1,7 @@
 import 'package:extended_list_view/context_menu.dart';
 import 'package:extended_list_view/extended_list_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 /// Stores the parameters for the size slider
 class SizeParameters {
@@ -103,7 +103,7 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
   }
 
   Widget buildContentItemGestureDetector(BuildContext context, T item,
-      ExtendedListContext<T> listContext, Widget child) {
+      ExtendedListContext<T> listContext, Widget child, int index) {
     if (listContext.contextMenuBuilder != null) {
       return ContextMenuRegion<T>(
           contextMenuController: listContext.contextMenuController!,
@@ -113,6 +113,18 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
     } else {
       return _buildGesture(context, item, listContext, child);
     }
+  }
+
+  Widget buildAutoScroll(BuildContext context, T item,
+      ExtendedListContext<T> listContext, Widget child, int index) {
+    if (listContext.autoScrollController == null) {
+      return child;
+    }
+    return AutoScrollTag(
+        key: ValueKey(index),
+        controller: listContext.autoScrollController!,
+        index: index,
+        child: child);
   }
 
   Widget _buildGesture(BuildContext context, T item,
@@ -133,8 +145,6 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
     ExtendedListContext<T> listContext,
   ) {
     return () {
-      print("Is Showna: ${listContext.contextMenuIsShown()}");
-
       if (listContext.contextMenuIsShown()) {
         listContext.contextMenuClear();
       } else if (listContext.onTap == null) {
@@ -143,19 +153,5 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
         listContext.onTap!(item);
       }
     };
-  }
-
-  Function()? _onTap2(
-    T item,
-    ExtendedListContext<T> listContext,
-  ) {
-    print("Is Shown: ${listContext.contextMenuIsShown()}");
-    if (listContext.contextMenuIsShown()) {
-      return () => listContext.contextMenuClear();
-    } else if (listContext.onTap == null) {
-      return null;
-    } else {
-      return () => listContext.onTap!(item);
-    }
   }
 }

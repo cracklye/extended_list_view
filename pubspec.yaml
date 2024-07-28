@@ -1,7 +1,7 @@
 name: extended_list_view
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
+
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  #auto_scroll:
+  scroll_to_index:
 
 dev_dependencies:
   flutter_test:

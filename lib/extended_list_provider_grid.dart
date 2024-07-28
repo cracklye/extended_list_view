@@ -15,24 +15,32 @@ class ListViewLayoutGrid<T> extends ListViewLayoutDefault<T> {
   @override
   Widget buildContent(
       BuildContext context, List<T> items, ExtendedListContext<T> listContext) {
+    int index = 0;
+
     return GridView.count(
+      controller: listContext.autoScrollController,
       crossAxisCount: 5,
       // shrinkWrap: true,
       children: items
-          .map((e) => buildGridItemDefault(context, e, listContext))
+          .map((e) => buildGridItemDefault(context, e, listContext, index++))
           .toList(),
     );
   }
 
-  Widget buildGridItemDefault(
-      BuildContext context, T item, ExtendedListContext<T> listContext) {
+  Widget buildGridItemDefault(BuildContext context, T item,
+      ExtendedListContext<T> listContext, int index) {
     var isSelected = listContext.isSelected(item);
 
     if (builder != null) {
       return builder!(context, listContext, item, isSelected);
     }
-    return buildContentItemGestureDetector(context, item, listContext,
-        buildContentItem(context, item, listContext));
+    return buildAutoScroll(
+        context,
+        item,
+        listContext,
+        buildContentItemGestureDetector(context, item, listContext,
+            buildContentItem(context, item, listContext), index),
+        index);
   }
 
   Widget buildContentItem(

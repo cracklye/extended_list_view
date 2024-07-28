@@ -1,3 +1,4 @@
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:extended_list_view/context_menu.dart';
 import 'package:extended_list_view/extended_list_view.dart';
 import 'package:extended_list_view/setting_store.dart';
@@ -65,9 +66,10 @@ class ExtendedListContext<T> {
       this.onLongTap,
       this.onReorder,
       this.selected,
-      required this.contextMenuController, 
+      required this.contextMenuController,
       required this.contextMenuClear,
       required this.contextMenuIsShown,
+      this.autoScrollController,
       this.contextMenuBuilder});
   final void Function(T)? onTap;
   final void Function(T)? onLongTap;
@@ -79,7 +81,8 @@ class ExtendedListContext<T> {
   final ContextMenuBuilder<T>? contextMenuBuilder;
   final void Function() contextMenuClear;
   final bool Function() contextMenuIsShown;
-  final ContextMenuController? contextMenuController; 
+  final ContextMenuController? contextMenuController;
+  final AutoScrollController? autoScrollController;
 
   //final Widget Function() contextMenuShow();
 }
@@ -108,6 +111,7 @@ class ExtendedListView<T> extends StatefulWidget {
     this.defaultSearchText,
     this.footerText = "",
     this.contextMenuBuilder,
+    this.autoScrollController,
     String? settingsKey,
     SettingsStorage? settings,
   }) : settingsStorer = settings
@@ -147,7 +151,7 @@ class ExtendedListView<T> extends StatefulWidget {
   final List<Widget> Function(BuildContext)? buildViewIcons;
   final ContextMenuBuilder<T>? contextMenuBuilder;
   final SettingsStorage? settingsStorer;
-
+  final AutoScrollController? autoScrollController;
   final String? defaultSearchText;
 }
 
@@ -297,6 +301,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
             onLongTap: widget.onLongTap,
             onDoubleTap: widget.onDoubleTap,
             onReorder: widget.onReorder,
+            autoScrollController: widget.autoScrollController,
             contextMenuController: _contextMenuController,
             contextMenuBuilder: widget.contextMenuBuilder,
             contextMenuIsShown: () => _contextMenuController.isShown,
