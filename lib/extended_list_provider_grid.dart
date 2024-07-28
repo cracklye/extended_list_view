@@ -1,4 +1,5 @@
 import 'package:extended_list_view/extended_list_view.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ListViewLayoutGrid<T> extends ListViewLayoutDefault<T> {
@@ -6,7 +7,7 @@ class ListViewLayoutGrid<T> extends ListViewLayoutDefault<T> {
       {super.enableSearch,
       super.enableSorting,
       super.key = "list_grid",
-      super.builder, 
+      super.builder,
       required super.selectIcon})
       : super(
             getSizeParameters: () =>
@@ -30,20 +31,46 @@ class ListViewLayoutGrid<T> extends ListViewLayoutDefault<T> {
     if (builder != null) {
       return builder!(context, listContext, item, isSelected);
     }
-
-    return GestureDetector(
-        onTap:
-            listContext.onTap == null ? null : () => listContext.onTap!(item),
-        onDoubleTap: listContext.onDoubleTap == null
-            ? null
-            : () => listContext.onDoubleTap!(item),
-        onLongPress: listContext.onLongTap == null
-            ? null
-            : () => listContext.onLongTap!(item),
-        child: Text(
-          item.toString(),
-          softWrap: true,
-          //overflow: TextOverflow.Wrap,
-        ));
+    return buildContentItemGestureDetector(context, item, listContext,
+        buildContentItem(context, item, listContext));
   }
+
+  Widget buildContentItem(
+      BuildContext context, T item, ExtendedListContext<T> listContext) {
+    var isSelected = listContext.isSelected(item);
+
+    return Padding(
+        padding: EdgeInsets.all(10),
+        child: GridTile(
+          // header: GestureDetector(
+          //   onTap: () {
+          //     if (onTap != null) {
+          //       onTap!(item);
+          //     }
+          //   },
+          //   onDoubleTap: () {
+          //     if (onDoubleTap != null) {
+          //       onDoubleTap!(item);
+          //     }
+          //   },
+          footer: GridTileBar(
+            title: Text(item.toString()),
+            backgroundColor: isSelected ? Colors.red : Colors.black45,
+          ),
+
+          child: CircleAvatar(
+              // backgroundColor: isSelected ? Colors.red : Colors.amber[100],
+              child: Text(getInitials(item.toString()))),
+        )
+        // Text(
+        //   item.toString(),
+        //   softWrap: true,
+        //   //overflow: TextOverflow.Wrap,
+        // )
+        );
+  }
+
+  String getInitials(String label) => label.isNotEmpty
+      ? label.trim().split(RegExp(' +')).map((s) => s[0]).take(4).join()
+      : '';
 }

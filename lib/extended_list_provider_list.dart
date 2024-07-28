@@ -21,114 +21,21 @@ class ListViewLayoutList<T> extends ListViewLayoutDefault<T> {
         if (builder != null) {
           return builder!(context, listContext, item, isSelected);
         }
-
-        return GestureDetector(
-            onTap: listContext.onTap == null
-                ? null
-                : () => listContext.onTap!(item),
-            onDoubleTap: listContext.onDoubleTap == null
-                ? null
-                : () => listContext.onDoubleTap!(item),
-            onLongPress: listContext.onLongTap == null
-                ? null
-                : () => listContext.onLongTap!(item),
-            child: ListTile(
-              selected: isSelected,
-              title: Text(item.toString()),
-              //)
-            ));
+        return buildContentItemGestureDetector(context, item, listContext,
+            buildContentItem(context, item, listContext));
       },
       itemCount: items.length,
     );
   }
 
-  // Widget _buildListEntryNoLongTap(BuildContext context, T e) {
-  //   //return Text("${e.displayLabel}", key: Key("label_${e.id}"),);
-  //   return
-  //       // Container(key: Key("extended_list_${e.id}"), child:
-  //       GestureDetector(
-  //           key: Key("extended_list_${e.id}"),
-  //           onTap: widget.onTap == null ? null : () => widget.onTap!(e),
-  //           onDoubleTap: widget.onDoubleTap == null
-  //               ? null
-  //               : () => widget.onDoubleTap!(e),
-  //           // onLongPress:
-  //           //     widget.onLongTap == null ? null : () => widget.onLongTap!(e),
-  //           child: widget.buildListItem == null
-  //               ? buildListItemDefault(
-  //                   context,
-  //                   e,
-  //                   widget.onTap == null ? null : () => widget.onTap!(e),
-  //                   widget.onDoubleTap == null
-  //                       ? null
-  //                       : () => widget.onDoubleTap!(e),
-  //                   null)
-  //               : widget.buildListItem!(
-  //                   context,
-  //                   e,
-  //                   widget.onTap == null ? null : () => widget.onTap!(e),
-  //                   widget.onDoubleTap == null
-  //                       ? null
-  //                       : () => widget.onDoubleTap!(e),
-  //                   null));
-  // }
+  Widget buildContentItem(
+      BuildContext context, T item, ExtendedListContext<T> listContext) {
+    var isSelected = listContext.isSelected(item);
 
-  // Widget _buildListEntry(BuildContext context, T e) {
-  //   //return Text("${e.displayLabel}", key: Key("label_${e.id}"),);
-  //   return
-  //       // Container(key: Key("extended_list_${e.id}"), child:
-  //       GestureDetector(
-  //           key: Key("extended_list_${e.id}"),
-  //           onTap: widget.onTap == null ? null : () => widget.onTap!(e),
-  //           onDoubleTap: widget.onDoubleTap == null
-  //               ? null
-  //               : () => widget.onDoubleTap!(e),
-  //           onLongPress:
-  //               widget.onLongTap == null ? null : () => widget.onLongTap!(e),
-  //           child: widget.buildListItem == null
-  //               ? buildListItemDefault(
-  //                   context,
-  //                   e,
-  //                   widget.onTap == null ? null : () => widget.onTap!(e),
-  //                   widget.onDoubleTap == null
-  //                       ? null
-  //                       : () => widget.onDoubleTap!(e),
-  //                   widget.onLongTap == null
-  //                       ? null
-  //                       : () => widget.onLongTap!(e),
-  //                 )
-  //               : widget.buildListItem!(
-  //                   context,
-  //                   e,
-  //                   widget.onTap == null ? null : () => widget.onTap!(e),
-  //                   widget.onDoubleTap == null
-  //                       ? null
-  //                       : () => widget.onDoubleTap!(e),
-  //                   widget.onLongTap == null
-  //                       ? null
-  //                       : () => widget.onLongTap!(e),
-  //                 ));
-  // }
-
-  // Widget buildListItemDefault(
-  //     BuildContext context, T item, onTap, onDoubleTap, onLongPress) {
-  //   //   print("List tile $item = ${widget.selected?.first}");
-
-  //   return ListTile(
-  //       selected: item == widget.selected?.first,
-  //       onTap: onTap,
-  //       onDoubleTap: onDoubleTap,
-  //       onLongPress: onLongPress,
-  //       title: Text(
-  //         item.displayLabel,
-  //         overflow: TextOverflow.ellipsis,
-  //       ),
-  //       leading: SizedBox(
-  //         width: 2,
-  //         child: Container(
-  //             color: widget.selected == item
-  //                 ? m.Colors.red
-  //                 : m.Colors.transparent),
-  //       ));
-  // }
+    return ListTile(
+      selected: isSelected,
+      title: Text(item.toString()),
+      //);
+    );
+  }
 }

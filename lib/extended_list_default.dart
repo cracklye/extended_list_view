@@ -1,4 +1,6 @@
+import 'package:extended_list_view/context_menu.dart';
 import 'package:extended_list_view/extended_list_view.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// Stores the parameters for the size slider
@@ -24,7 +26,7 @@ abstract class ListViewLayoutProvider<T> {
 
   // This widget will be inserted under the toolbar but above the main content
   Widget Function(BuildContext buildContext)? buildToolbarSub;
-  
+
   Widget Function(BuildContext buildContext)? buildToolbarFooter;
 
   Widget Function()? buildLoadingContent;
@@ -79,11 +81,12 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
   // This widget will be inserted under the toolbar but above the main content
   Widget Function(BuildContext buildContext)? buildToolbarSub;
 
-
   @override
   Widget Function()? get buildLoadingContent => _buildLoadingContent;
   Widget _buildLoadingContent() {
-    return const Text("Loading");
+    return const Center(
+        child:
+            Column(children: [CircularProgressIndicator(), Text("Loading")]));
   }
 
   @override
@@ -97,5 +100,62 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
   Widget buildContent(
       BuildContext context, List<T> items, ExtendedListContext<T> listContext) {
     return Text("The buildContent method needs to be overridden $items");
+  }
+
+  Widget buildContentItemGestureDetector(BuildContext context, T item,
+      ExtendedListContext<T> listContext, Widget child) {
+    if (listContext.contextMenuBuilder != null) {
+      return ContextMenuRegion<T>(
+          contextMenuController: listContext.contextMenuController!,
+          contextMenuBuilder: listContext.contextMenuBuilder!,
+          item: item,
+          child: _buildGesture(context, item, listContext, child));
+    } else {
+      return _buildGesture(context, item, listContext, child);
+    }
+  }
+
+  Widget _buildGesture(BuildContext context, T item,
+      ExtendedListContext<T> listContext, Widget child) {
+    return GestureDetector(
+        onTap: _onTap(item, listContext),
+        onDoubleTap: listContext.onDoubleTap == null
+            ? null
+            : () => listContext.onDoubleTap!(item),
+        onLongPress: listContext.onLongTap == null
+            ? null
+            : () => listContext.onLongTap!(item),
+        child: child);
+  }
+
+  Function()? _onTap(
+    T item,
+    ExtendedListContext<T> listContext,
+  ) {
+    return () {
+      print("Is Showna: ${listContext.contextMenuIsShown()}");
+
+      if (listContext.contextMenuIsShown()) {
+        listContext.contextMenuClear();
+      } else if (listContext.onTap == null) {
+        // return null;
+      } else {
+        listContext.onTap!(item);
+      }
+    };
+  }
+
+  Function()? _onTap2(
+    T item,
+    ExtendedListContext<T> listContext,
+  ) {
+    print("Is Shown: ${listContext.contextMenuIsShown()}");
+    if (listContext.contextMenuIsShown()) {
+      return () => listContext.contextMenuClear();
+    } else if (listContext.onTap == null) {
+      return null;
+    } else {
+      return () => listContext.onTap!(item);
+    }
   }
 }

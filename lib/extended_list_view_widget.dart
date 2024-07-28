@@ -1,3 +1,4 @@
+import 'package:extended_list_view/context_menu.dart';
 import 'package:extended_list_view/extended_list_view.dart';
 import 'package:extended_list_view/setting_store.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,11 @@ class ExtendedListContext<T> {
       this.onTap,
       this.onLongTap,
       this.onReorder,
-      this.selected});
+      this.selected,
+      required this.contextMenuController, 
+      required this.contextMenuClear,
+      required this.contextMenuIsShown,
+      this.contextMenuBuilder});
   final void Function(T)? onTap;
   final void Function(T)? onLongTap;
   final void Function(T)? onDoubleTap;
@@ -71,6 +76,12 @@ class ExtendedListContext<T> {
       T? after, T? parent)? onReorder;
   final List<T>? selected;
   bool isSelected(T item) => selected?.contains(item) == true;
+  final ContextMenuBuilder<T>? contextMenuBuilder;
+  final void Function() contextMenuClear;
+  final bool Function() contextMenuIsShown;
+  final ContextMenuController? contextMenuController; 
+
+  //final Widget Function() contextMenuShow();
 }
 
 class ExtendedListView<T> extends StatefulWidget {
@@ -96,6 +107,7 @@ class ExtendedListView<T> extends StatefulWidget {
     this.enableSearch = true,
     this.defaultSearchText,
     this.footerText = "",
+    this.contextMenuBuilder,
     String? settingsKey,
     SettingsStorage? settings,
   }) : settingsStorer = settings
@@ -133,7 +145,7 @@ class ExtendedListView<T> extends StatefulWidget {
   final Widget Function(BuildContext)? buildToolbarSub;
   final Widget Function(BuildContext)? buildToolbarFooter;
   final List<Widget> Function(BuildContext)? buildViewIcons;
-
+  final ContextMenuBuilder<T>? contextMenuBuilder;
   final SettingsStorage? settingsStorer;
 
   final String? defaultSearchText;
@@ -143,6 +155,26 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
   late ListViewLayoutProvider<T> _listViewType;
   late TextEditingController _searchController;
   late double _gridColumns;
+  final ContextMenuController _contextMenuController = ContextMenuController();
+
+  //TODO auto scroll if required
+  // Future _scrollToCounter() async {
+  //   await controller.scrollToIndex(counter,
+  //       preferPosition: AutoScrollPosition.begin);
+  //   controller.highlight(counter);
+  // }
+  // setState(() => counter = state.selection.index);
+  //         _scrollToCounter();
+//  return AutoScrollTag(
+//                 key: ValueKey(index),
+//                 controller: controller,
+//                 index: index,
+//                 child: GridViewEntryItem(
+//                   photo: entry.entry,
+//                   tileStyle: ViewEntryListGridTileStyle.twoLine,
+//                   onTap: widget.onTap,
+//                   onDoubleTap: widget.onDoubleTap,
+//                 ));
 
   @override
   void initState() {
@@ -264,7 +296,11 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
             onTap: widget.onTap,
             onLongTap: widget.onLongTap,
             onDoubleTap: widget.onDoubleTap,
-            onReorder: widget.onReorder));
+            onReorder: widget.onReorder,
+            contextMenuController: _contextMenuController,
+            contextMenuBuilder: widget.contextMenuBuilder,
+            contextMenuIsShown: () => _contextMenuController.isShown,
+            contextMenuClear: () => _contextMenuController.remove()));
   }
 
   Widget buildToolbar(BuildContext context) {
@@ -280,24 +316,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
                     onPressed: () => widget.onOrderByChange!(e),
                   ))
               .toList(),
-          // [
-          //   MenuItemButton(
-          //     child: Text("Remove Cover image"),
-          //     onPressed: () => print("Remove cover image"),
-          //   ),
-          //   MenuItemButton(
-          //     child: Text("Add Cover image"),
-          //     onPressed: () => print("Add cover image"),
-          //   ),
-          //   MenuItemButton(
-          //     child: Text("Delete"),
-          //     onPressed: () => print("Delete"),
-          //   ),
-          //   MenuItemButton(
-          //     child: Text("Export Note"),
-          //     onPressed: () async => await _doNoteExport(model),
-          //   ),
-          // ],
+
           builder:
               (BuildContext context, MenuController controller, Widget? child) {
             return IconButton(
@@ -313,25 +332,6 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
             );
           },
         ));
-
-        // btns.add(DropDownButton<ListViewOrderByItem>(
-        //   title: const Icon(Icons.arrow_downward),
-        //   onPressed: (p0) => widget.onOrderByChange!(p0),
-        //   items: widget.orderBy!
-        //       .map((e) => DropDownItem<ListViewOrderByItem>(
-        //             //TODO selected:
-        //             content: e.label,
-        //             value: e,
-        //           ))
-        //       .toList(),
-        // ));
-
-        // for (var ob in widget.orderBy!) {
-        //   btns.add(ElevatedButton(
-        //     child: ob.label,
-        //     onPressed: () => widget.onOrderByChange!(ob),
-        //   ));
-        // }
       }
     }
 
