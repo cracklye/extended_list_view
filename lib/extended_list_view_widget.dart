@@ -94,6 +94,7 @@ class ExtendedListView<T> extends StatefulWidget {
     required this.items,
     this.buildToolbarSub,
     this.buildToolbarFooter,
+    this.buildToolbar,
     this.buildViewIcons,
     required this.listDataProviders,
     this.orderBy,
@@ -148,6 +149,8 @@ class ExtendedListView<T> extends StatefulWidget {
 
   final Widget Function(BuildContext)? buildToolbarSub;
   final Widget Function(BuildContext)? buildToolbarFooter;
+  final Widget Function(BuildContext)? buildToolbar;
+
   final List<Widget> Function(BuildContext)? buildViewIcons;
   final ContextMenuBuilder<T>? contextMenuBuilder;
   final SettingsStorage? settingsStorer;
@@ -228,7 +231,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildToolbar(context),
+        _buildToolbar(context),
         buildSubToolbar(),
         Expanded(child: buildContent(context)),
         buildFooter(context),
@@ -308,7 +311,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
             contextMenuClear: () => _contextMenuController.remove()));
   }
 
-  Widget buildToolbar(BuildContext context) {
+  Widget _buildToolbar(BuildContext context) {
     List<Widget> btns = [];
     if (widget.onOrderByChange != null && widget.orderBy != null) {
       if (widget.orderBy!.length > 1) {
@@ -345,6 +348,9 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
         Expanded(
           child: buildSearchBox(context),
         ),
+        (widget.buildToolbar != null)
+            ? widget.buildToolbar!(context)
+            : Container(),
         ...btns,
         ...widget.listDataProviders.length < 2
             ? []

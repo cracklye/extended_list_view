@@ -29,6 +29,8 @@ abstract class ListViewLayoutProvider<T> {
 
   Widget Function(BuildContext buildContext)? buildToolbarFooter;
 
+  
+
   Widget Function()? buildLoadingContent;
   Widget Function()? buildNoContent;
   Widget buildContent(
@@ -79,7 +81,7 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
   @override
 
   // This widget will be inserted under the toolbar but above the main content
-  Widget Function(BuildContext buildContext)? buildToolbarSub;
+  //Widget Function(BuildContext buildContext)? buildToolbarSub;
 
   @override
   Widget Function()? get buildLoadingContent => _buildLoadingContent;
