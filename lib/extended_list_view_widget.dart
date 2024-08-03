@@ -78,7 +78,8 @@ class ExtendedListContext<T> {
       T? after, T? parent)? onReorder;
   final List<T>? selected;
   bool isSelected(T item) => selected?.contains(item) == true;
-  final ContextMenuBuilder<T>? contextMenuBuilder;
+  final Widget Function<T>(BuildContext context, Offset offset, T item)?
+      contextMenuBuilder;
   final void Function() contextMenuClear;
   final bool Function() contextMenuIsShown;
   final ContextMenuController? contextMenuController;
@@ -152,7 +153,8 @@ class ExtendedListView<T> extends StatefulWidget {
   final Widget Function(BuildContext)? buildToolbar;
 
   final List<Widget> Function(BuildContext)? buildViewIcons;
-  final ContextMenuBuilder<T>? contextMenuBuilder;
+  final Widget Function<T>(BuildContext context, Offset offset, T item)?
+      contextMenuBuilder;
   final SettingsStorage? settingsStorer;
   final AutoScrollController? autoScrollController;
   final String? defaultSearchText;

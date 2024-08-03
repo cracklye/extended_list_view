@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// A builder that includes an Offset to draw the context menu at.
-typedef ContextMenuBuilder<T> = Widget Function<B>(
-    BuildContext context, Offset offset, B item);
+// typedef ContextMenuBuilder<T> = Widget Function<B>(
+//     BuildContext context, Offset offset, List<B> item);
 
 // _ContextMenuRegion(
 //           contextMenuBuilder: (BuildContext context, Offset offset) {
@@ -36,14 +36,15 @@ class ContextMenuRegion<T> extends StatefulWidget {
     required this.child,
     required this.contextMenuBuilder,
     required this.item,
-   required this.contextMenuController,
+    required this.contextMenuController,
   });
   final T item;
 
   final ContextMenuController contextMenuController;
 
   /// Builds the context menu.
-  final ContextMenuBuilder contextMenuBuilder;
+  final Widget Function<T>(BuildContext context, Offset offset, T item)
+      contextMenuBuilder;
 
   /// The child widget that will be listened to for gestures.
   final Widget child;
@@ -59,7 +60,7 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
   @override
   void initState() {
     _contextMenuController =
-        widget.contextMenuController ;//?? ContextMenuController();
+        widget.contextMenuController; //?? ContextMenuController();
     super.initState();
   }
 
@@ -89,13 +90,13 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
     _hide();
   }
 
-  void _onTapUp(TapUpDetails details) {
-    print("Tap Up");
-    if (!_contextMenuController.isShown) {
-      return;
-    }
-    _hide();
-  }
+  // void _onTapUp(TapUpDetails details) {
+  //   print("Tap Up");
+  //   if (!_contextMenuController.isShown) {
+  //     return;
+  //   }
+  //   _hide();
+  // }
 
   void _onLongPressStart(LongPressStartDetails details) {
     _longPressOffset = details.globalPosition;
@@ -130,7 +131,7 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+      behavior: HitTestBehavior.translucent,
       onSecondaryTapUp: _onSecondaryTapUp,
       onTap: _onTap,
       //onTapUp: _onTapUp,
