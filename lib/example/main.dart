@@ -1,4 +1,5 @@
 import 'package:extended_list_view/context_menu.dart';
+import 'package:extended_list_view/extended_list_provider_gallery.dart';
 import 'package:extended_list_view/extended_list_view.dart';
 import 'package:flutter/material.dart';
 
@@ -282,7 +283,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ListViewLayoutGrid<TestItem>(selectIcon: Icons.grid_3x3),
               ListViewLayoutList(selectIcon: Icons.list),
               ListViewLayoutSortable<TestItem>(selectIcon: Icons.sort),
-              ListViewLayoutTable(selectIcon: Icons.table_bar_rounded)
+              ListViewLayoutTable(selectIcon: Icons.table_bar_rounded),
+              ListViewLayoutGallery(selectIcon: Icons.table_bar_rounded)
+              
             ],
             contextMenuBuilder: _enableContextMenu ? contextMenuBuilder : null,
             buildToolbarFooter: _enableBuildToolbarFooter
