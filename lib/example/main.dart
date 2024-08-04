@@ -96,6 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _enableContextMenu = false;
   bool _enableBuildToolbarFooter = false;
   bool _enableBuildToolbarSub = false;
+  bool _fixedSize = false;
 
   static AutoScrollController _autoscrollController = AutoScrollController();
 
@@ -111,6 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _toggleEnableBuildToolbarFooter() {
     setState(() {
       _enableBuildToolbarFooter = !_enableBuildToolbarFooter;
+    });
+  }
+
+  void _toggleFixedSize() {
+    setState(() {
+      _fixedSize = !_fixedSize;
     });
   }
 
@@ -210,6 +217,9 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Wrap(
             children: [
+              Text(" | Fixed Size: "),
+              Checkbox(
+                  value: _fixedSize, onChanged: (value) => _toggleFixedSize()),
               Text(" | Empty List: "),
               Checkbox(
                   value: _listIsEmpty,
@@ -260,45 +270,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList(),
             ),
           Divider(),
-          Expanded(
-              child: ExtendedListView<TestItem>(
-            autoScrollController:
-                enableMoveToItem ? _autoscrollController : null,
-            isLoading: _isLoading,
-            defaultSearchText: "Default Search Text",
-            enableSearch: _enableSearch,
-            selected: _enableSelected ? _selected : [],
-            onTap: (p0) => setLastAction('onTap: $p0', p0),
-            onDoubleTap: (p0) => setLastAction('onDoubleTap: $p0', p0),
-            onLongTap: (p0) => setLastAction('onLongTap: $p0', p0),
-            onFilterByChange: (p0) => setLastAction('onFilterByChange: $p0'),
-            onOrderByChange: (p0) => setLastAction('onOrderByChange: $p0'),
-            onReorder: (int previousPosition, int newPosition, TestItem item,
-                    TestItem? before, TestItem? after, TestItem? parent) =>
-                setLastAction(
-                    'onReorder: Previous = $previousPosition,new= $newPosition,item= $item, before= $before, after= $after, parent=$parent'),
-            onSearchChange: (p0) => setLastAction('onSearchChange: $p0'),
-            onSearchClear: (p0) => setLastAction('onSearchClear: $p0'),
-            listDataProviders: [
-              ListViewLayoutGrid<TestItem>(selectIcon: Icons.grid_3x3),
-              ListViewLayoutList(selectIcon: Icons.list),
-              ListViewLayoutSortable<TestItem>(selectIcon: Icons.sort),
-              ListViewLayoutTable(selectIcon: Icons.table_bar_rounded),
-              ListViewLayoutGallery(selectIcon: Icons.table_bar_rounded)
-              
-            ],
-            contextMenuBuilder: _enableContextMenu ? contextMenuBuilder : null,
-            buildToolbarFooter: _enableBuildToolbarFooter
-                ? (context) => Text("This is the toolbar footer")
-                : null,
-            buildToolbarSub: _enableBuildToolbarSub
-                ? (context) => Text("This is the toolbar sub")
-                : null,
-            // buildToolbarFooter: _enableBuildToolbar? (context)=>  Text("This is the footer"):null,
-
-            items: _listIsEmpty ? [] : options,
-          )),
+          _fixedSize
+              ? SizedBox(height: 200, child: _buildListView(context))
+              : Expanded(child: _buildListView(context)),
           Text(_lastAction),
+          
         ],
       ),
 
@@ -307,6 +283,44 @@ class _MyHomePageState extends State<MyHomePage> {
       //   tooltip: 'Increment',
       //   child: const Icon(Icons.add),
       // ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _buildListView(BuildContext context) {
+    return ExtendedListView<TestItem>(
+      autoScrollController: enableMoveToItem ? _autoscrollController : null,
+      isLoading: _isLoading,
+      defaultSearchText: "Default Search Text",
+      enableSearch: _enableSearch,
+      selected: _enableSelected ? _selected : [],
+      onTap: (p0) => setLastAction('onTap: $p0', p0),
+      onDoubleTap: (p0) => setLastAction('onDoubleTap: $p0', p0),
+      onLongTap: (p0) => setLastAction('onLongTap: $p0', p0),
+      onFilterByChange: (p0) => setLastAction('onFilterByChange: $p0'),
+      onOrderByChange: (p0) => setLastAction('onOrderByChange: $p0'),
+      onReorder: (int previousPosition, int newPosition, TestItem item,
+              TestItem? before, TestItem? after, TestItem? parent) =>
+          setLastAction(
+              'onReorder: Previous = $previousPosition,new= $newPosition,item= $item, before= $before, after= $after, parent=$parent'),
+      onSearchChange: (p0) => setLastAction('onSearchChange: $p0'),
+      onSearchClear: (p0) => setLastAction('onSearchClear: $p0'),
+      listDataProviders: [
+        ListViewLayoutGrid<TestItem>(selectIcon: Icons.grid_3x3),
+        ListViewLayoutList(selectIcon: Icons.list),
+        ListViewLayoutSortable<TestItem>(selectIcon: Icons.sort),
+        ListViewLayoutTable(selectIcon: Icons.table_bar_rounded),
+        ListViewLayoutGallery(selectIcon: Icons.image)
+      ],
+      contextMenuBuilder: _enableContextMenu ? contextMenuBuilder : null,
+      buildToolbarFooter: _enableBuildToolbarFooter
+          ? (context) => Text("This is the toolbar footer")
+          : null,
+      buildToolbarSub: _enableBuildToolbarSub
+          ? (context) => Text("This is the toolbar sub")
+          : null,
+      // buildToolbarFooter: _enableBuildToolbar? (context)=>  Text("This is the footer"):null,
+
+      items: _listIsEmpty ? [] : options,
     );
   }
 }
