@@ -94,6 +94,7 @@ class ExtendedListView<T> extends StatefulWidget {
     this.selected,
     required this.items,
     this.buildToolbarSub,
+    this.buildToolbarLeading,
     this.buildToolbarFooter,
     this.buildToolbar,
     this.buildViewIcons,
@@ -148,7 +149,8 @@ class ExtendedListView<T> extends StatefulWidget {
   final void Function(int previousPosition, int newPosition, T item, T? before,
       T? after, T? parent)? onReorder;
 
-  final Widget Function(BuildContext)? buildToolbarSub;
+final Widget Function(BuildContext)? buildToolbarSub;
+  final Widget Function(BuildContext)? buildToolbarLeading;
   final Widget Function(BuildContext)? buildToolbarFooter;
   final Widget Function(BuildContext)? buildToolbar;
 
@@ -228,11 +230,25 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
     }
     return Container();
   }
+   Widget buildToolbarLeading() {
+    List<Widget> widgets = [];
+
+    if (widget.buildToolbarLeading != null) {
+      widgets.add(widget.buildToolbarLeading!(context));
+    }
+    if (widgets.isNotEmpty) {
+      return Row(
+        children: widgets,
+      );
+    }
+    return Container();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        buildToolbarLeading(),
         _buildToolbar(context),
         buildSubToolbar(),
         Expanded(child: buildContent(context)),

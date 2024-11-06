@@ -85,6 +85,8 @@ abstract class ListViewLayoutDefault<T> extends ListViewLayoutProvider<T> {
 
   @override
   Widget Function()? get buildLoadingContent => _buildLoadingContent;
+
+  
   Widget _buildLoadingContent() {
     return const Center(
         child:
