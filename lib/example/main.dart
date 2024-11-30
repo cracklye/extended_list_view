@@ -1,10 +1,9 @@
-
 import 'package:extended_list_view/extended_list_provider_gallery.dart';
 import 'package:extended_list_view/extended_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 import 'test_item.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 
 void main() {
   runApp(const MyApp());
@@ -96,9 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _enableContextMenu = false;
   bool _enableBuildToolbarFooter = false;
   bool _enableBuildToolbarSub = false;
+  bool _enableOrderBy = false;
+  bool _enableFilterBy = false;
   bool _fixedSize = false;
+  bool _enableBuildToolbarLeading = false;
 
-  static AutoScrollController _autoscrollController = AutoScrollController();
+  static final AutoScrollController _autoscrollController =
+      AutoScrollController();
 
   List<TestItem> _selected = [];
   bool _enableSelected = false;
@@ -106,6 +109,24 @@ class _MyHomePageState extends State<MyHomePage> {
   void _toggleEnableBuildToolbarSub() {
     setState(() {
       _enableBuildToolbarSub = !_enableBuildToolbarSub;
+    });
+  }
+
+  void _toggleEnableBuildToolbarLeading() {
+    setState(() {
+      _enableBuildToolbarLeading = !_enableBuildToolbarLeading;
+    });
+  }
+
+  void _toggleEnableOrderBy() {
+    setState(() {
+      _enableOrderBy = !_enableOrderBy;
+    });
+  }
+
+  void _toggleEnableFilterBy() {
+    setState(() {
+      _enableFilterBy = !_enableFilterBy;
     });
   }
 
@@ -217,41 +238,53 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Wrap(
             children: [
-              Text(" | Fixed Size: "),
+              const Text(" | Fixed Size: "),
               Checkbox(
                   value: _fixedSize, onChanged: (value) => _toggleFixedSize()),
-              Text(" | Empty List: "),
+              const Text(" | Empty List: "),
               Checkbox(
                   value: _listIsEmpty,
                   onChanged: (value) => _toggleListIsEmpty()),
-              Text(" | Enable Move To Item: "),
+              const Text(" | Enable Move To Item: "),
               Checkbox(
                   value: enableMoveToItem,
                   onChanged: (value) => _toggleEnableMoveToItem()),
-              Text(" | Enable Search "),
+              const Text(" | Enable Search "),
               Checkbox(
                   value: _enableSearch,
                   onChanged: (value) => _toggleEnableSearch()),
-              Text(" | Enable Context Menu "),
+              const Text(" | Enable Context Menu "),
               Checkbox(
                   value: _enableContextMenu,
                   onChanged: (value) => _toggleEnableContextMenu()),
-              Text(" | Enable Selected "),
+              const Text(" | Enable Selected "),
               Checkbox(
                   value: _enableSelected,
                   onChanged: (value) => _toggleEnableSelected()),
-              Text(" | Is Loading "),
+              const Text(" | Is Loading "),
               Checkbox(
                   value: _isLoading, onChanged: (value) => _toggleIsLoading()),
-              Text(" | Build TB Sub "),
+              const Text(" | Build TB Sub "),
               Checkbox(
                   value: _enableBuildToolbarSub,
                   onChanged: (value) => _toggleEnableBuildToolbarSub()),
-              Text(" |  Build TB Footer "),
+              const Text(" |  Build TB Footer "),
               Checkbox(
                   value: _enableBuildToolbarFooter,
                   onChanged: (value) => _toggleEnableBuildToolbarFooter()),
-              Text(" | ")
+              const Text(" | Leading toolbar"),
+              Checkbox(
+                  value: _enableBuildToolbarLeading,
+                  onChanged: (value) => _toggleEnableBuildToolbarLeading()),
+              const Text(" | Order By"),
+              Checkbox(
+                  value: _enableOrderBy,
+                  onChanged: (value) => _toggleEnableOrderBy()),
+              const Text(" | Filter By"),
+              Checkbox(
+                  value: _enableFilterBy,
+                  onChanged: (value) => _toggleEnableFilterBy()),
+              const Text(" | "),
             ],
           ),
           if (_enableSelected)
@@ -269,12 +302,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       : Text(i.toString()))
                   .toList(),
             ),
-          Divider(),
+          const Divider(),
           _fixedSize
               ? SizedBox(height: 200, child: _buildListView(context))
               : Expanded(child: _buildListView(context)),
           Text(_lastAction),
-          
         ],
       ),
 
@@ -297,6 +329,22 @@ class _MyHomePageState extends State<MyHomePage> {
       onDoubleTap: (p0) => setLastAction('onDoubleTap: $p0', p0),
       onLongTap: (p0) => setLastAction('onLongTap: $p0', p0),
       onFilterByChange: (p0) => setLastAction('onFilterByChange: $p0'),
+
+      selectedOrderBy: 2,
+      orderBy: _enableOrderBy
+          ? [
+              ListViewOrderByItem(label: "Name", value: 1),
+              ListViewOrderByItem(label: "Sort order", value: 2),
+            ]
+          : [],
+      selectedFilterBy: const [2, 3],
+      filterBy: _enableFilterBy
+          ? [
+              ListViewFilterByItem(label: "Name", value: 1),
+              ListViewFilterByItem(label: "sort Order", value: 2),
+              ListViewFilterByItem(label: "Somthing else", value: 3),
+            ]
+          : [],
       onOrderByChange: (p0) => setLastAction('onOrderByChange: $p0'),
       onReorder: (int previousPosition, int newPosition, TestItem item,
               TestItem? before, TestItem? after, TestItem? parent) =>
@@ -313,11 +361,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
       contextMenuBuilder: _enableContextMenu ? contextMenuBuilder : null,
       buildToolbarFooter: _enableBuildToolbarFooter
-          ? (context) => Text("This is the toolbar footer")
+          ? (context) => const Text("This is the toolbar footer")
           : null,
       buildToolbarSub: _enableBuildToolbarSub
-          ? (context) => Text("This is the toolbar sub")
+          ? (context) => const Text("This is the toolbar sub")
           : null,
+
+      buildToolbarLeading: _enableBuildToolbarLeading
+          ? (context) => const Text("This is the toolbar Leading")
+          : null,
+
       // buildToolbarFooter: _enableBuildToolbar? (context)=>  Text("This is the footer"):null,
 
       items: _listIsEmpty ? [] : options,

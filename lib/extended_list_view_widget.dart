@@ -1,8 +1,7 @@
-import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:extended_list_view/context_menu.dart';
 import 'package:extended_list_view/extended_list_view.dart';
 import 'package:extended_list_view/setting_store.dart';
 import 'package:flutter/material.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 // enum ListViewType {
 //   tree,
@@ -47,16 +46,16 @@ class ListViewFilterField<T> extends ListViewFilter<T> {
       this.isString, this.label);
 }
 
-class ListViewOrderByItem<T> {
-  final Widget label;
-
-  ListViewOrderByItem(this.label);
+class ListViewOrderByItem {
+  final String label;
+  final dynamic value;
+  ListViewOrderByItem({required this.label, this.value});
 }
 
-class ListViewFilterByItem<T> {
-  final Widget label;
-  final List<ListViewFilter<T>> Function() getFilters;
-  ListViewFilterByItem(this.label, this.getFilters);
+class ListViewFilterByItem {
+  final String label;
+  final dynamic value;
+  ListViewFilterByItem({required this.label, this.value});
 }
 
 class ExtendedListContext<T> {
@@ -115,6 +114,8 @@ class ExtendedListView<T> extends StatefulWidget {
     this.footerText = "",
     this.contextMenuBuilder,
     this.autoScrollController,
+    this.selectedFilterBy,
+    this.selectedOrderBy,
     String? settingsKey,
     SettingsStorage? settings,
   }) : settingsStorer = settings
@@ -134,12 +135,12 @@ class ExtendedListView<T> extends StatefulWidget {
   final List<ListViewLayoutProvider<T>> listDataProviders;
 
   final List<ListViewOrderByItem>? orderBy;
-  final List<ListViewFilterByItem<T>>? filterBy;
+  final List<ListViewFilterByItem>? filterBy;
 
   final bool isLoading;
 
   final Function(ListViewOrderByItem?)? onOrderByChange;
-  final Function(ListViewFilterByItem<T>?)? onFilterByChange;
+  final Function(ListViewFilterByItem?)? onFilterByChange;
   final Function(String?)? onSearchChange;
   final Function(String?)? onSearchClear;
 
@@ -149,7 +150,7 @@ class ExtendedListView<T> extends StatefulWidget {
   final void Function(int previousPosition, int newPosition, T item, T? before,
       T? after, T? parent)? onReorder;
 
-final Widget Function(BuildContext)? buildToolbarSub;
+  final Widget Function(BuildContext)? buildToolbarSub;
   final Widget Function(BuildContext)? buildToolbarLeading;
   final Widget Function(BuildContext)? buildToolbarFooter;
   final Widget Function(BuildContext)? buildToolbar;
@@ -160,6 +161,9 @@ final Widget Function(BuildContext)? buildToolbarSub;
   final SettingsStorage? settingsStorer;
   final AutoScrollController? autoScrollController;
   final String? defaultSearchText;
+
+  final dynamic selectedOrderBy;
+  final List<dynamic>? selectedFilterBy;
 }
 
 class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
@@ -230,7 +234,8 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
     }
     return Container();
   }
-   Widget buildToolbarLeading() {
+
+  Widget buildToolbarLeading() {
     List<Widget> widgets = [];
 
     if (widget.buildToolbarLeading != null) {
@@ -300,9 +305,9 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
       if (_listViewType.buildLoadingContent != null) {
         return _listViewType.buildLoadingContent!();
       }
-      return Center(
-          child: Column(
-              children: const [CircularProgressIndicator(), Text("Loading")]));
+      return const Center(
+          child:
+              Column(children: [CircularProgressIndicator(), Text("Loading")]));
     }
 
     if (widget.items.isEmpty) {
@@ -329,16 +334,18 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
             contextMenuClear: () => _contextMenuController.remove()));
   }
 
-  Widget _buildToolbar(BuildContext context) {
-    List<Widget> btns = [];
+  Widget? buildToolbarOrderBy() {
     if (widget.onOrderByChange != null && widget.orderBy != null) {
       if (widget.orderBy!.length > 1) {
-        //TODO need to set the
-        btns.add(MenuAnchor(
+        return MenuAnchor(
           // childFocusNode: _buttonFocusNode,
           menuChildren: widget.orderBy!
               .map((e) => MenuItemButton(
-                    child: e.label,
+                    leadingIcon: widget.selectedOrderBy == e ||
+                            widget.selectedOrderBy == e.value
+                        ? const Icon(Icons.check)
+                        : null,
+                    child: Text(e.label),
                     onPressed: () => widget.onOrderByChange!(e),
                   ))
               .toList(),
@@ -354,11 +361,79 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
                   controller.open();
                 }
               },
-              icon: Icon(Icons.arrow_downward),
+              icon: const Icon(Icons.arrow_downward),
             );
           },
-        ));
+        );
       }
+    }
+    return null;
+  }
+
+  Widget? buildToolbarFilterBy() {
+    if (widget.onFilterByChange != null && widget.filterBy != null) {
+      if (widget.filterBy!.length > 1) {
+        return MenuAnchor(
+          // childFocusNode: _buttonFocusNode,
+          menuChildren: widget.filterBy!
+              .map((e) => MenuItemButton(
+                    leadingIcon: (widget.selectedFilterBy != null &&
+                            (widget.selectedFilterBy!.contains(e) ||
+                                widget.selectedFilterBy!.contains(e.value)))
+                        ? const Icon(Icons.check)
+                        : null,
+                    child: Text(e.label),
+                    onPressed: () => widget.onFilterByChange!(e),
+                  ))
+              .toList(),
+
+          builder:
+              (BuildContext context, MenuController controller, Widget? child) {
+            return IconButton(
+              // focusNode: _buttonFocusNode,
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              icon: const Icon(Icons.arrow_downward),
+            );
+          },
+        );
+      }
+    }
+    return null;
+  }
+
+  void addToolbarSeparator(List<Widget> btns) {
+    if (btns.isNotEmpty) {
+      btns.add(const Text("|"));
+      // btns.add(const VerticalDivider(
+      //   color: Colors.red,
+      //   thickness: 4,
+      //   width: 4,
+      // ));
+    }
+  }
+
+  Widget _buildToolbar(BuildContext context) {
+    List<Widget> btns = [];
+
+    Widget? w = buildToolbarOrderBy();
+    if (w != null) {
+      btns.add(w);
+    }
+
+    w = buildToolbarFilterBy();
+    if (w != null) {
+      addToolbarSeparator(btns);
+      btns.add(w);
+    }
+
+    if (widget.listDataProviders.length > 1) {
+      addToolbarSeparator(btns);
     }
 
     return Row(
@@ -395,12 +470,12 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
               }
             },
             decoration: InputDecoration(
-                prefixIcon:
-                    Icon(Icons.search), // prefixIcon ?? Icon(m.Icons.done),
+                prefixIcon: const Icon(
+                    Icons.search), // prefixIcon ?? Icon(m.Icons.done),
                 suffixIcon: widget.onSearchClear == null
                     ? null
                     : IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.clear,
                         ),
                         onPressed: _searchController.text == ""
