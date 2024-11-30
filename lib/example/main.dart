@@ -99,6 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _enableFilterBy = false;
   bool _fixedSize = false;
   bool _enableBuildToolbarLeading = false;
+  bool _multiLayoutProvider = false;
 
   static final AutoScrollController _autoscrollController =
       AutoScrollController();
@@ -115,6 +116,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _toggleEnableBuildToolbarLeading() {
     setState(() {
       _enableBuildToolbarLeading = !_enableBuildToolbarLeading;
+    });
+  }
+
+  void _toggleMultiLayoutProvider() {
+    setState(() {
+      _multiLayoutProvider = !_multiLayoutProvider;
     });
   }
 
@@ -284,6 +291,10 @@ class _MyHomePageState extends State<MyHomePage> {
               Checkbox(
                   value: _enableFilterBy,
                   onChanged: (value) => _toggleEnableFilterBy()),
+              const Text(" | Multiple Layout Providers"),
+              Checkbox(
+                  value: _multiLayoutProvider,
+                  onChanged: (value) => _toggleMultiLayoutProvider()),
               const Text(" | "),
             ],
           ),
@@ -353,11 +364,14 @@ class _MyHomePageState extends State<MyHomePage> {
       onSearchChange: (p0) => setLastAction('onSearchChange: $p0'),
       onSearchClear: (p0) => setLastAction('onSearchClear: $p0'),
       listDataProviders: [
-        ListViewLayoutGrid<TestItem>(selectIcon: Icons.grid_3x3),
         ListViewLayoutList(selectIcon: Icons.list),
-        ListViewLayoutSortable<TestItem>(selectIcon: Icons.sort),
-        ListViewLayoutTable(selectIcon: Icons.table_bar_rounded),
-        ListViewLayoutGallery(selectIcon: Icons.image)
+        if (_multiLayoutProvider)
+          ListViewLayoutGrid<TestItem>(selectIcon: Icons.grid_3x3),
+        if (_multiLayoutProvider)
+          ListViewLayoutSortable<TestItem>(selectIcon: Icons.sort),
+        if (_multiLayoutProvider)
+          ListViewLayoutTable(selectIcon: Icons.table_bar_rounded),
+        if (_multiLayoutProvider) ListViewLayoutGallery(selectIcon: Icons.image)
       ],
       contextMenuBuilder: _enableContextMenu ? contextMenuBuilder : null,
       buildToolbarFooter: _enableBuildToolbarFooter

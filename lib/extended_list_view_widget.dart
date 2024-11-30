@@ -361,7 +361,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
                   controller.open();
                 }
               },
-              icon: const Icon(Icons.arrow_downward),
+              icon: const Icon(Icons.sort),
             );
           },
         );
@@ -398,7 +398,7 @@ class _ExtendedListViewState<T> extends State<ExtendedListView<T>> {
                   controller.open();
                 }
               },
-              icon: const Icon(Icons.arrow_downward),
+              icon: const Icon(Icons.filter_alt),
             );
           },
         );
